@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from .models import *
 from django.db.models import Sum
+from django.utils import timezone
 
 # Create your views here.
 def home(request):
@@ -24,9 +25,12 @@ def dashboard(request):
     total_lose = slp.filter(Mode='lose').count()
     totalLoseWin = total_lose+total_win
     WinRate = total_win/totalLoseWin * 100.0
+    now = timezone.now()
+
+    slpToday = slp.filter(date_created=now).count()
 
     TotalSLP = SLP.objects.aggregate(Sum('slp'))['slp__sum']
-    context = {'player':player, 'slp':slp,'WinRate':WinRate,'TotalSLP':TotalSLP}
+    context = {'player':player, 'slp':slp,'WinRate':WinRate,'TotalSLP':TotalSLP,'slpToday':slpToday}
 
     return render(request,'accounts/dashboard.html',context)
 
